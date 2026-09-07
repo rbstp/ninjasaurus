@@ -5,6 +5,11 @@ Stomp raptors, bump blocks, grab coins, get big with an onigiri, throw shurikens
 
 Everything is generated in code. Sprites are pixel art stored as character grids and rasterized at launch, sound effects are synthesized, and the icon comes from a script. No third-party dependencies, no network, no ads.
 
+![Title](docs/screenshots/title.png)
+![Bamboo Meadow](docs/screenshots/level-1-1.png)
+![Cloud Temple](docs/screenshots/level-1-3.png)
+![Rex's Lair](docs/screenshots/rex.png)
+
 ## Controls
 
 Landscape only. The left half of the screen is the d-pad, the right half jumps. The small star button throws shurikens when you have the scroll, and holding it makes the ninja run. Game controllers and a hardware keyboard (arrows, space, X) also work.
