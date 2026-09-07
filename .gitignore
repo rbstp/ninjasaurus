@@ -60,3 +60,7 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
+
+# Ninjasaurus: the Xcode project is generated from project.yml by xcodegen.
+*.xcodeproj
+DerivedData/
