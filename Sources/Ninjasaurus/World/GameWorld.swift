@@ -196,7 +196,7 @@ final class GameWorld {
         guard let col = bumpable.min(by: { abs(Tiles.origin($0) + 8 - player.rect.midX) < abs(Tiles.origin($1) + 8 - player.rect.midX) }) else {
             return
         }
-        let outcome = blocks.bump(col: col, row: row, map: &map, form: player.form, frame: frame)
+        let outcome = blocks.bump(col: col, row: row, map: &map, form: player.form, frame: frame, roll: rng.nextUnit())
         emit(.blockBumped(col: col, row: row))
         let blockRect = TileMap.rect(col: col, row: row)
         switch outcome {
@@ -350,10 +350,7 @@ final class GameWorld {
             }
             emit(.scorePopup(points: GameConstants.powerUpScore, at: item.rect.center))
         case .shurikenScroll:
-            if player.form == .small {
-                player.setForm(.big)
-                phase = .frozen(20)
-            } else if player.form == .big {
+            if player.form != .shuriken {
                 player.setForm(.shuriken)
                 phase = .frozen(20)
             }

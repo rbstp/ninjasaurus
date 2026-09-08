@@ -39,12 +39,24 @@ final class GameplayRulesTests: XCTestCase {
         XCTAssertFalse(again.contains { if case .coinCollected = $0 { return true } else { return false } })
     }
 
-    func testPowerBlockGivesOnigiriWhenSmallAndScrollWhenBig() {
+    func testPowerBlockGivesOnigiriOrScrollWhenSmallAndScrollWhenBig() {
         let (small, smallEvents) = bump(col: 5)
-        XCTAssertTrue(smallEvents.contains(.itemEmerged(kind: .onigiri, col: 5, row: 5)))
-        XCTAssertEqual(small.items.first?.powerUp, .onigiri)
+        let emerged = smallEvents.compactMap { event -> PowerUpKind? in
+            if case .itemEmerged(let kind, 5, 5) = event { return kind }
+            return nil
+        }
+        XCTAssertEqual(emerged.count, 1)
+        XCTAssertTrue(emerged[0] == .onigiri || emerged[0] == .shurikenScroll)
+        XCTAssertEqual(small.items.first?.powerUp, emerged[0])
         let (_, bigEvents) = bump(col: 5, form: .big)
         XCTAssertTrue(bigEvents.contains(.itemEmerged(kind: .shurikenScroll, col: 5, row: 5)))
+    }
+
+    func testScrollWhenSmallGoesStraightToShurikenForm() {
+        let world = WorldTestSupport.world(WorldTestSupport.flat)
+        WorldTestSupport.run(world, frames: 2)
+        _ = collect(.shurikenScroll, in: world)
+        XCTAssertEqual(world.player.form, .shuriken)
     }
 
     func testBrickOnlyBreaksWhenBig() {

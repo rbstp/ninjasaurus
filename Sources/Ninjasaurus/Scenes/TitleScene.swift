@@ -34,20 +34,20 @@ final class TitleScene: BaseScene {
         addChild(prompt)
 
         ninja = context.textures.sprite("ninja.big.idle")
-        ninja.setScale(2)
+        ninja.setScale(1.5)
         ninja.zPosition = 5
         addChild(ninja)
         ninja.run(SKAction.repeatForever(SKAction.sequence([
             .wait(forDuration: 1.2),
-            .setTexture(context.textures.texture("ninja.big.jump"), resize: true),
+            .setTexture(context.textures.texture("ninja.big.jump")),
             .moveBy(x: 0, y: 40, duration: 0.35),
             .moveBy(x: 0, y: -40, duration: 0.3),
-            .setTexture(context.textures.texture("ninja.big.idle"), resize: true),
+            .setTexture(context.textures.texture("ninja.big.idle")),
         ])))
         raptor = context.textures.sprite("raptor.walk1")
-        raptor.setScale(2)
+        raptor.setScale(1.5)
         raptor.zPosition = 4
-        raptor.xScale = -2
+        raptor.xScale = -1.5
         addChild(raptor)
         raptor.run(SKAction.repeatForever(SKAction.animate(with: [context.textures.texture("raptor.walk1"), context.textures.texture("raptor.walk2")], timePerFrame: 0.18)))
         layoutForSize()
@@ -58,10 +58,10 @@ final class TitleScene: BaseScene {
         sky.size = size
         far.position = CGPoint(x: (size.width - 512) / 2, y: 0)
         let centerX = size.width / 2
-        shadow.position = CGPoint(x: centerX + 2, y: size.height * 0.66 - 2)
-        title.position = CGPoint(x: centerX, y: size.height * 0.66)
-        subtitle.position = CGPoint(x: centerX, y: size.height * 0.66 - 16)
-        prompt.position = CGPoint(x: centerX, y: size.height * 0.36)
+        shadow.position = CGPoint(x: centerX + 2, y: size.height * 0.74 - 2)
+        title.position = CGPoint(x: centerX, y: size.height * 0.74)
+        subtitle.position = CGPoint(x: centerX, y: size.height * 0.74 - 16)
+        prompt.position = CGPoint(x: centerX, y: size.height * 0.5)
         groundTiles.forEach { $0.removeFromParent() }
         groundTiles.removeAll()
         var x: CGFloat = 0
@@ -74,14 +74,14 @@ final class TitleScene: BaseScene {
             }
             x += 16
         }
-        ninja.position = CGPoint(x: centerX - 60, y: 32)
-        raptor.position = CGPoint(x: centerX + 70, y: 32)
+        ninja.position = CGPoint(x: centerX - 90, y: 32)
+        raptor.position = CGPoint(x: centerX + 90, y: 32)
         raptor.removeAction(forKey: "walk")
         raptor.run(SKAction.repeatForever(SKAction.sequence([
             .moveBy(x: -40, y: 0, duration: 2),
-            .scaleX(to: 2, duration: 0),
+            .scaleX(to: 1.5, duration: 0),
             .moveBy(x: 40, y: 0, duration: 2),
-            .scaleX(to: -2, duration: 0),
+            .scaleX(to: -1.5, duration: 0),
         ])), withKey: "walk")
     }
 

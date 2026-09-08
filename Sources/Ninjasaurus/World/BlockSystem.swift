@@ -10,7 +10,7 @@ struct BlockSystem: Sendable {
 
     private(set) var bumps: [TileCoord: Int] = [:]
 
-    mutating func bump(col: Int, row: Int, map: inout TileMap, form: PlayerForm, frame: Int) -> Outcome {
+    mutating func bump(col: Int, row: Int, map: inout TileMap, form: PlayerForm, frame: Int, roll: Double = 1) -> Outcome {
         let kind = map[col, row]
         guard kind.isBumpable else { return .none }
         let coord = TileCoord(col: col, row: row)
@@ -22,7 +22,7 @@ struct BlockSystem: Sendable {
         case .questionPower:
             map[coord] = .used
             bumps[coord] = frame
-            return .spawnItem(form == .small ? .onigiri : .shurikenScroll)
+            return .spawnItem(form == .small && roll >= 0.4 ? .onigiri : .shurikenScroll)
         case .questionKatana:
             map[coord] = .used
             bumps[coord] = frame

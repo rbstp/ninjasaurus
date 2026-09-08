@@ -8,13 +8,19 @@ struct PixelSprite: Equatable, Sendable {
     let width: Int
     let height: Int
     let pixels: [PixelColor]
+    /// Sprite pixels per game unit.
+    let scale: Int
 
-    init(width: Int, height: Int, pixels: [PixelColor]) {
+    init(width: Int, height: Int, pixels: [PixelColor], scale: Int = 1) {
         precondition(pixels.count == width * height, "pixel count mismatch")
         self.width = width
         self.height = height
         self.pixels = pixels
+        self.scale = scale
     }
+
+    var unitWidth: Double { Double(width) / Double(scale) }
+    var unitHeight: Double { Double(height) / Double(scale) }
 
     init(palette: Palette, rows: [String]) {
         do {
@@ -55,11 +61,11 @@ struct PixelSprite: Equatable, Sendable {
                 out[y * width + x] = pixels[y * width + (width - 1 - x)]
             }
         }
-        return PixelSprite(width: width, height: height, pixels: out)
+        return PixelSprite(width: width, height: height, pixels: out, scale: scale)
     }
 
     func recolored(_ transform: (PixelColor) -> PixelColor) -> PixelSprite {
-        PixelSprite(width: width, height: height, pixels: pixels.map { $0.isTransparent ? $0 : transform($0) })
+        PixelSprite(width: width, height: height, pixels: pixels.map { $0.isTransparent ? $0 : transform($0) }, scale: scale)
     }
 
     func recolored(mapping: [PixelColor: PixelColor]) -> PixelSprite {

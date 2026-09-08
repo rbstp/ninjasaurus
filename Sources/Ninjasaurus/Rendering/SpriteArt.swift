@@ -15,4 +15,7 @@ enum SpriteArt {
         out["fx.white"] = PixelSprite(palette: ["W": .white], rows: Array(repeating: String(repeating: "W", count: 8), count: 8))
         return out
     }()
+
+    /// Reserved for atlas packing checks: every registered sprite and its scale.
+    static var scales: [String: Int] { registry.mapValues { $0.scale } }
 }

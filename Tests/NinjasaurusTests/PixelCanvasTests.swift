@@ -82,7 +82,34 @@ final class PixelCanvasTests: XCTestCase {
     func testRegistryFitsInAnAtlasAndHasNoDuplicates() throws {
         let layout = try AtlasBuilder.buildFitting(SpriteArt.registry)
         XCTAssertEqual(layout.rects.count, SpriteArt.registry.count)
-        XCTAssertLessThanOrEqual(layout.canvas.width, 1024)
+        XCTAssertLessThanOrEqual(layout.canvas.width, 2048)
+        for name in ["ninja.small.idle", "ninja.big.idle", "raptor.walk1", "rex.idle", "tile.brick", "item.onigiri", "hud.heart"] {
+            XCTAssertEqual(SpriteArt.registry[name]?.scale, 2, name)
+        }
+        XCTAssertEqual(SpriteArt.registry["ninja.small.idle"]?.unitHeight, 16)
+        XCTAssertEqual(SpriteArt.registry["ninja.big.idle"]?.unitHeight, 32)
+        XCTAssertEqual(SpriteArt.registry["tile.brick"]?.unitWidth, 16)
+    }
+
+    func testPainterShapesOutlineAndBevel() {
+        var p = PixelPainter(width: 8, height: 8)
+        p.fillEllipse(cx: 4, cy: 4, rx: 3, ry: 3, PixelColor(0x808080))
+        XCTAssertFalse(p[4, 4].isTransparent)
+        XCTAssertTrue(p[0, 0].isTransparent)
+        p.outline(.black)
+        XCTAssertEqual(p[4, 1], .black)
+        XCTAssertEqual(p[4, 4], PixelColor(0x808080))
+        p.bevel(outline: .black)
+        XCTAssertGreaterThan(p[4, 2].r, 0x80)
+        XCTAssertLessThan(p[4, 6].r, 0x80)
+        var q = PixelPainter(width: 8, height: 8)
+        q.fillPolygon([(0, 0), (8, 0), (8, 8), (0, 8)], .white)
+        XCTAssertEqual(q.pixels.filter { !$0.isTransparent }.count, 64)
+        q.line(0, 0, 7, 7, .black)
+        XCTAssertEqual(q[3, 3], .black)
+        XCTAssertEqual(q[3, 4], .white)
+        let sprite = q.sprite(scale: 2)
+        XCTAssertEqual(sprite.unitWidth, 4)
     }
 
     func testAnimationClipFrames() {

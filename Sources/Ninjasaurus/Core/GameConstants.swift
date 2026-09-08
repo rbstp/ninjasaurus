@@ -1,7 +1,7 @@
 enum GameConstants {
     // MARK: World
     static let tileSize: Double = 16
-    static let viewportHeight: Double = 208          // 13 tiles
+    static let viewportHeight: Double = 176
     static let stepDuration: Double = 1.0 / 60.0
     static let maxStepsPerFrame = 4
     static let pitDeathY: Double = -16               // player top below this = fell in a pit

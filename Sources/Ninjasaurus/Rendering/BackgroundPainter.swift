@@ -46,7 +46,7 @@ enum BackgroundPainter {
     }
 
     private static func gradient(_ context: CGContext, top: UInt32, bottom: UInt32, height: Int) {
-        let steps = 8
+        let steps = 16
         for i in 0..<steps {
             let t = CGFloat(i) / CGFloat(steps - 1)
             let mix = { (a: UInt32, b: UInt32, shift: UInt32) -> CGFloat in
@@ -74,12 +74,18 @@ enum BackgroundPainter {
         draw(width: layerWidth, height: layerHeight) { context in
             switch theme {
             case .grass:
-                context.setFillColor(color(0x58B858))
                 for (x, r) in [(10, 22), (48, 30), (92, 18), (124, 26)] {
+                    context.setFillColor(color(0x2C7838))
+                    context.fillEllipse(in: CGRect(x: x - r - 1, y: 7 - r / 2, width: 2 * r + 2, height: r + r / 2 + 1))
+                    context.setFillColor(color(0x58B858))
                     context.fillEllipse(in: CGRect(x: x - r, y: 8 - r / 2, width: 2 * r, height: r + r / 2))
+                    context.setFillColor(color(0x80D870))
+                    context.fillEllipse(in: CGRect(x: x - r / 2, y: 8 + r / 4, width: r, height: r / 2))
                 }
-                context.setFillColor(color(0x489848))
+                context.setFillColor(color(0x2C7838))
                 context.fill(CGRect(x: 0, y: 0, width: layerWidth, height: 9))
+                context.setFillColor(color(0x489848))
+                context.fill(CGRect(x: 0, y: 0, width: layerWidth, height: 7))
             case .cave:
                 context.setFillColor(color(0x1C2840))
                 for x in stride(from: 0, to: layerWidth, by: 12) {
@@ -116,14 +122,21 @@ enum BackgroundPainter {
         draw(width: layerWidth, height: layerHeight) { context in
             switch theme {
             case .grass:
-                context.setFillColor(color(0x2C8838))
                 for (x, r) in [(20, 6), (30, 8), (72, 7), (82, 5), (110, 6)] {
+                    context.setFillColor(color(0x1C6028))
+                    context.fillEllipse(in: CGRect(x: x - r - 1, y: 0, width: 2 * r + 2, height: r + 5))
+                    context.setFillColor(color(0x2C8838))
                     context.fillEllipse(in: CGRect(x: x - r, y: 0, width: 2 * r, height: r + 4))
+                    context.setFillColor(color(0x50B048))
+                    context.fillEllipse(in: CGRect(x: x - r / 2, y: 2, width: r, height: r / 2 + 1))
                 }
-                context.setFillColor(color(0xFFFFFF, alpha: 0.9))
                 for (x, w) in [(8, 18), (60, 24), (104, 16)] {
-                    context.fillEllipse(in: CGRect(x: x, y: 36, width: w, height: 6))
-                    context.fillEllipse(in: CGRect(x: x + w / 4, y: 38, width: w / 2, height: 7))
+                    context.setFillColor(color(0xB8DCF8))
+                    context.fillEllipse(in: CGRect(x: x, y: 35, width: w, height: 7))
+                    context.fillEllipse(in: CGRect(x: x + w / 4, y: 37, width: w / 2, height: 8))
+                    context.setFillColor(color(0xFFFFFF))
+                    context.fillEllipse(in: CGRect(x: x + 1, y: 37, width: w - 2, height: 5))
+                    context.fillEllipse(in: CGRect(x: x + w / 4 + 1, y: 39, width: w / 2 - 2, height: 6))
                 }
             case .cave:
                 context.setFillColor(color(0x60C8E8, alpha: 0.9))

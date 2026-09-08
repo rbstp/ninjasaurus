@@ -6,6 +6,7 @@ final class TextureStore {
     private let atlas: SKTexture
     private let atlasSize: Int
     private let rects: [String: AtlasRect]
+    private let scales: [String: Int]
     private var cache: [String: SKTexture] = [:]
 
     init() {
@@ -17,6 +18,7 @@ final class TextureStore {
         }
         atlasSize = layout.canvas.width
         rects = layout.rects
+        scales = SpriteArt.registry.mapValues { $0.scale }
         atlas = TextureStore.makeTexture(from: layout.canvas)
         atlas.filteringMode = .nearest
     }
@@ -47,7 +49,8 @@ final class TextureStore {
 
     func size(of name: String) -> CGSize {
         guard let rect = rects[name] else { return CGSize(width: 16, height: 16) }
-        return CGSize(width: rect.width, height: rect.height)
+        let scale = CGFloat(scales[name] ?? 1)
+        return CGSize(width: CGFloat(rect.width) / scale, height: CGFloat(rect.height) / scale)
     }
 
     func sprite(_ name: String, anchor: CGPoint = CGPoint(x: 0.5, y: 0)) -> SKSpriteNode {
