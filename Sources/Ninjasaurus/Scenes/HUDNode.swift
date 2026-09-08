@@ -9,6 +9,7 @@ final class HUDNode: SKNode {
     private let coinIcon: SKSpriteNode
     private let pauseIcon: SKSpriteNode
     private var hearts: [SKSpriteNode] = []
+    private let bossLabel: PixelTextNode
     private var lastLives = -1
     private var lastCoins = -1
     private var lastScore = -1
@@ -21,7 +22,10 @@ final class HUDNode: SKNode {
         livesIcon = textures.sprite("hud.ninjaHead", anchor: .zero)
         coinIcon = textures.sprite("hud.coin", anchor: .zero)
         pauseIcon = textures.sprite("hud.pause", anchor: CGPoint(x: 1, y: 1))
+        bossLabel = PixelTextNode("REX", textures: textures, color: SKColor(red: 1, green: 0.55, blue: 0.5, alpha: 1), alignment: .right)
+        bossLabel.isHidden = true
         super.init()
+        addChild(bossLabel)
         zPosition = 100
         for node in [livesIcon, coinIcon, pauseIcon] { addChild(node) }
         for node in [livesText, coinsText, scoreText] { addChild(node) }
@@ -53,8 +57,9 @@ final class HUDNode: SKNode {
         pauseIcon.position = CGPoint(x: right, y: top)
         pauseRect = CGRect(x: right - 28, y: top - 28, width: 40, height: 40)
         for (index, heart) in hearts.enumerated() {
-            heart.position = CGPoint(x: CGFloat(index - 1) * 12, y: top - 18)
+            heart.position = CGPoint(x: CGFloat(index) * 12 + 4, y: top - 18)
         }
+        bossLabel.position = CGPoint(x: -6, y: top - 26)
     }
 
     func update(lives: Int, coins: Int, score: Int, bossHitPoints: Int?) {
@@ -70,6 +75,7 @@ final class HUDNode: SKNode {
             scoreText.text = String(format: "%06d", min(score, 999_999))
             lastScore = score
         }
+        bossLabel.isHidden = bossHitPoints == nil
         for (index, heart) in hearts.enumerated() {
             guard let hp = bossHitPoints else {
                 heart.isHidden = true
