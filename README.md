@@ -24,6 +24,7 @@ make test      # unit tests on the iPhone 17 Pro Max simulator
 make run       # build, install and launch on the simulator
 make shot      # screenshot the booted simulator into .build/
 make icon      # regenerate the app icon
+make music     # render the songs to .build/music/*.wav
 ```
 
 Open `Ninjasaurus.xcodeproj` to run on a real iPhone. For Zed, VS Code or Neovim, `brew install xcode-build-server` then `make lsp` once so SourceKit-LSP sees the whole project instead of one file at a time. Debug builds use automatic signing with the team's Apple Development certificate.

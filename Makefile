@@ -8,6 +8,7 @@
 #   make archive    Release archive (needs the Apple Distribution cert + profile)
 #   make upload     upload the archive to TestFlight (needs API_KEY, API_KEY_ID, API_ISSUER)
 #   make lsp        buildServer.json so Zed, VS Code and Neovim resolve types across files
+#   make music      render the songs to .build/music/*.wav
 
 SCHEME     := Ninjasaurus
 PROJECT    := Ninjasaurus.xcodeproj
@@ -24,7 +25,7 @@ BUILD_NUM  ?= 1
 
 XCB := xcodebuild -project $(PROJECT) -scheme $(SCHEME) -derivedDataPath $(DERIVED)
 
-.PHONY: all project build test run shot icon archive upload lsp clean
+.PHONY: all project build test run shot icon archive upload lsp music clean
 
 all: test
 
@@ -74,6 +75,15 @@ upload:
 		-exportOptionsPlist scripts/ExportOptions.plist -exportPath "$(BUILD)/export" \
 		-authenticationKeyPath "$(API_KEY)" -authenticationKeyID "$(API_KEY_ID)" \
 		-authenticationKeyIssuerID "$(API_ISSUER)"
+
+MUSIC_SOURCES := scripts/music/main.swift Sources/Ninjasaurus/Audio/Music.swift Sources/Ninjasaurus/Audio/ToneSynth.swift \
+	Sources/Ninjasaurus/Core/SeededRandom.swift Sources/Ninjasaurus/Core/Geometry.swift Sources/Ninjasaurus/Core/GameConstants.swift \
+	Sources/Ninjasaurus/Core/GameEvent.swift Sources/Ninjasaurus/Levels/Tile.swift
+
+music:
+	@mkdir -p $(BUILD)
+	swiftc -O -o $(BUILD)/render-music $(MUSIC_SOURCES)
+	$(BUILD)/render-music $(BUILD)/music
 
 lsp: project
 	@command -v xcode-build-server >/dev/null || { echo "brew install xcode-build-server"; exit 1; }
