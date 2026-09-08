@@ -55,11 +55,11 @@ class BaseScene: SKScene {
     func layoutForSize() {}
 
     func applicationWillResignActive() {
-        context.audio.pauseMusic()
+        context.audio.setAppActive(false)
     }
 
     func applicationDidBecomeActive() {
-        context.audio.resumeMusic()
+        context.audio.setAppActive(true)
     }
 
     func present(_ scene: BaseScene, transition: SKTransition = .fade(withDuration: 0.4)) {

@@ -24,7 +24,7 @@ final class OverlayNode: SKNode {
         addChild(title)
         if let subtitle { addChild(subtitle) }
         for (label, action) in buttonSpecs {
-            let button = SKShapeNode(rectOf: CGSize(width: 90, height: 28), cornerRadius: 6)
+            let button = SKShapeNode(rectOf: CGSize(width: 88, height: 28), cornerRadius: 6)
             button.fillColor = SKColor(red: 0.85, green: 0.16, blue: 0.16, alpha: 1)
             button.strokeColor = .white
             button.lineWidth = 1
@@ -45,7 +45,7 @@ final class OverlayNode: SKNode {
     private func layout() {
         title.position = CGPoint(x: 0, y: buttons.isEmpty ? 4 : 30)
         subtitle?.position = CGPoint(x: 0, y: title.position.y - 16)
-        let spacing: CGFloat = 100
+        let spacing: CGFloat = 104
         let startX = -spacing * CGFloat(buttons.count - 1) / 2
         for (index, button) in buttons.enumerated() {
             button.node.position = CGPoint(x: startX + spacing * CGFloat(index), y: -24)
@@ -60,7 +60,7 @@ final class OverlayNode: SKNode {
 
     func action(at point: CGPoint) -> Action {
         for button in buttons {
-            let frame = button.node.frame.insetBy(dx: -10, dy: -10)
+            let frame = button.node.frame.insetBy(dx: -6, dy: -10)
             if frame.contains(point) { return button.action }
         }
         return .none

@@ -352,6 +352,7 @@ final class GameScene: BaseScene {
     }
 
     override func applicationWillResignActive() {
+        super.applicationWillResignActive()
         pauseGame()
     }
 
