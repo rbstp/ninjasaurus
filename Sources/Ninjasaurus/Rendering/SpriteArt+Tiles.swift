@@ -136,7 +136,6 @@ extension SpriteArt {
         p.fillRect(14, 14, 20, 16, glyph)
         p.fillRect(14, 16, 17, 20, glyph)
         p.fillRect(14, 22, 17, 25, glyph)
-        p.fillRect(12, 8, 19, 8, glyph.lightened(0.5))
         return p.sprite(scale: 2)
     }
 
