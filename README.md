@@ -26,7 +26,7 @@ make shot      # screenshot the booted simulator into .build/
 make icon      # regenerate the app icon
 ```
 
-Open `Ninjasaurus.xcodeproj` to run on a real iPhone. Debug builds use automatic signing with the team's Apple Development certificate.
+Open `Ninjasaurus.xcodeproj` to run on a real iPhone. For Zed, VS Code or Neovim, `brew install xcode-build-server` then `make lsp` once so SourceKit-LSP sees the whole project instead of one file at a time. Debug builds use automatic signing with the team's Apple Development certificate.
 
 ## Layout
 

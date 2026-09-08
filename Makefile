@@ -7,6 +7,7 @@
 #   make icon       regenerate the app icon PNG from the game's sprite art
 #   make archive    Release archive (needs the Apple Distribution cert + profile)
 #   make upload     upload the archive to TestFlight (needs API_KEY, API_KEY_ID, API_ISSUER)
+#   make lsp        buildServer.json so Zed, VS Code and Neovim resolve types across files
 
 SCHEME     := Ninjasaurus
 PROJECT    := Ninjasaurus.xcodeproj
@@ -23,7 +24,7 @@ BUILD_NUM  ?= 1
 
 XCB := xcodebuild -project $(PROJECT) -scheme $(SCHEME) -derivedDataPath $(DERIVED)
 
-.PHONY: all project build test run shot icon archive upload clean
+.PHONY: all project build test run shot icon archive upload lsp clean
 
 all: test
 
@@ -74,5 +75,10 @@ upload:
 		-authenticationKeyPath "$(API_KEY)" -authenticationKeyID "$(API_KEY_ID)" \
 		-authenticationKeyIssuerID "$(API_ISSUER)"
 
+lsp: project
+	@command -v xcode-build-server >/dev/null || { echo "brew install xcode-build-server"; exit 1; }
+	xcode-build-server config -project $(PROJECT) -scheme $(SCHEME)
+	$(XCB) -destination '$(DEST)' -configuration Debug CODE_SIGNING_ALLOWED=NO build
+
 clean:
-	rm -rf $(BUILD) $(PROJECT)
+	rm -rf $(BUILD) $(PROJECT) buildServer.json
