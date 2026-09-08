@@ -128,7 +128,11 @@ final class GameScene: BaseScene {
     }
 
     private func refreshHUD() {
-        hud.update(lives: context.session.lives, coins: context.session.coins, score: context.session.score, bossHitPoints: world.boss?.hitPoints)
+        var bossHitPoints: Int?
+        if let rex = world.boss, rex.phase != .sleeping {
+            bossHitPoints = rex.hitPoints
+        }
+        hud.update(lives: context.session.lives, coins: context.session.coins, score: context.session.score, bossHitPoints: bossHitPoints)
     }
 
     private func syncCamera() {
