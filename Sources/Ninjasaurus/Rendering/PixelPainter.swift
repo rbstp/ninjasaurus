@@ -147,6 +147,44 @@ struct PixelPainter {
         pixels = out
     }
 
+    /// Transparent pixels touching an opaque one (8 neighbours) become the outline colour.
+    mutating func outlineOutward(_ color: PixelColor) {
+        var out = pixels
+        for y in 0..<height {
+            for x in 0..<width where self[x, y].isTransparent {
+                var touches = false
+                for dy in -1...1 {
+                    for dx in -1...1 where !(dx == 0 && dy == 0) {
+                        if !self[x + dx, y + dy].isTransparent { touches = true }
+                    }
+                }
+                if touches { out[y * width + x] = color }
+            }
+        }
+        pixels = out
+    }
+
+    /// EPX / Scale2x: doubles the size and rounds staircase edges.
+    func scaled2x() -> PixelPainter {
+        var out = PixelPainter(width: width * 2, height: height * 2)
+        for y in 0..<height {
+            for x in 0..<width {
+                let p = self[x, y]
+                let a = self[x, y - 1], b = self[x + 1, y], c = self[x - 1, y], d = self[x, y + 1]
+                var tl = p, tr = p, bl = p, br = p
+                if c == a && c != d && a != b { tl = a }
+                if a == b && a != c && b != d { tr = b }
+                if d == c && d != b && c != a { bl = c }
+                if b == d && b != a && d != c { br = d }
+                out[x * 2, y * 2] = tl
+                out[x * 2 + 1, y * 2] = tr
+                out[x * 2, y * 2 + 1] = bl
+                out[x * 2 + 1, y * 2 + 1] = br
+            }
+        }
+        return out
+    }
+
     func flippedHorizontally() -> PixelPainter {
         var out = self
         for y in 0..<height {

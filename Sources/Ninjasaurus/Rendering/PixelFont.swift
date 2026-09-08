@@ -1,9 +1,10 @@
 import SpriteKit
 
 enum PixelFont {
-    static let glyphWidth = 5
-    static let glyphHeight = 7
-    static let advance = 6
+    static let glyphWidth = 6
+    static let glyphHeight = 8
+    static let advance = 7
+    private static let outlineColor = PixelColor(0x202030)
 
     private static let ink: Palette = ["#": .white]
 
@@ -67,7 +68,22 @@ enum PixelFont {
     static let sprites: [String: PixelSprite] = {
         var out: [String: PixelSprite] = [:]
         for (char, rows) in glyphs {
-            out[spriteName(for: char)!] = PixelSprite(palette: ink, rows: rows)
+            let small = PixelSprite(palette: ink, rows: rows)
+            var painter = PixelPainter(width: small.width, height: small.height)
+            for y in 0..<small.height {
+                for x in 0..<small.width {
+                    painter[x, y] = small.pixel(x: x, y: y)
+                }
+            }
+            let big = painter.scaled2x()
+            var framed = PixelPainter(width: glyphWidth * 2, height: glyphHeight * 2)
+            for y in 0..<big.height {
+                for x in 0..<big.width {
+                    framed[x + 1, y + 1] = big[x, y]
+                }
+            }
+            framed.outlineOutward(outlineColor)
+            out[spriteName(for: char)!] = framed.sprite(scale: 2)
         }
         return out
     }()
