@@ -47,9 +47,9 @@ for x in stride(from: 0, to: size, by: tile) {
 }
 
 let ninja = SpriteArt.bigNinja(.standard, .idle)
-draw(ninja, x: 90, y: tile, scale: 12)
+draw(ninja, x: 60, y: tile, scale: 9)
 let rex = SpriteArt.rex(.roar).flippedHorizontally()
-draw(rex, x: 480, y: tile, scale: 8)
+draw(rex, x: 370, y: tile, scale: 10)
 
 let image = context.makeImage()!
 let destination = CGImageDestinationCreateWithURL(URL(fileURLWithPath: output) as CFURL, UTType.png.identifier as CFString, 1, nil)!

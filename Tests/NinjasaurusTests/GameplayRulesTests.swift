@@ -220,6 +220,36 @@ final class GameplayRulesTests: XCTestCase {
         XCTAssertTrue(world.enemies.isEmpty, "stomped raptor came back")
     }
 
+    func testWalkersTurnAwayFromLava() {
+        let lava = """
+        ! name: Lava
+        ! theme: lava
+        ..............................
+        ..............................
+        ..............................
+        ..............................
+        ..............................
+        ..............................
+        ..............................
+        ..............................
+        ..............................
+        ..............................
+        .S....r............a.......F..
+        GGGGGGGGGGGG~~GGGGGGGGGG~~GGGG
+        ##############################
+        """
+        let world = WorldTestSupport.world(lava)
+        for enemy in world.enemies { enemy.facing = .right }
+        world.player.invulnerableFrames = 100_000
+        WorldTestSupport.run(world, frames: 600)
+        XCTAssertEqual(world.enemies.count, 2)
+        for enemy in world.enemies {
+            XCTAssertTrue(enemy.onGround)
+            let cols = Tiles.index(enemy.rect.minX + 1)...Tiles.index(enemy.rect.maxX - 1)
+            XCTAssertFalse(cols.contains { world.map[$0, 1].isHazard }, "\(enemy.kind) is standing in lava")
+        }
+    }
+
     func testRaptorWalksOffLedgesButAnkyTurnsAround() {
         let ledge = """
         ! name: Ledge

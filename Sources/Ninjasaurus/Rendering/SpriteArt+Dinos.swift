@@ -178,50 +178,66 @@ extension SpriteArt {
     enum RexPose: String, CaseIterable { case idle, walk1, walk2, leap, stun, roar }
 
     static func rex(_ pose: RexPose) -> PixelSprite {
-        let red = PixelColor(0xC84838), belly = PixelColor(0xF0D0A0), mouth = PixelColor(0x601018), eyeYellow = Colors.yellow, fire = Colors.orange
+        let hide = PixelColor(0x5C7C40), hideDark = PixelColor(0x3C5430), belly = PixelColor(0xC4BC98), ridge = PixelColor(0x2C4024)
+        let mouth = PixelColor(0x6C1420), tooth = PixelColor(0xF4F0E0), eyeYellow = PixelColor(0xF8D040), fire = Colors.orange
         var p = PixelPainter(width: 64, height: 64)
-        p.fillPolygon([(20, 38), (0, 26), (1, 34), (22, 48)], red)
-        p.shadedEllipse(cx: 30, cy: 40, rx: 15, ry: 12, red)
-        p.fillEllipse(cx: 31, cy: 44, rx: 9, ry: 6, belly)
-        p.fillPolygon([(36, 30), (44, 16), (54, 26), (42, 40)], red)
-        p.shadedEllipse(cx: 47, cy: 16, rx: 13, ry: 10, red)
-        p.fillPolygon([(52, 11), (63.5, 15), (63.5, 20), (50, 21)], red)
-        let open = pose == .roar ? 6.0 : 0
-        p.fillPolygon([(50, 20), (63.5, 20), (63.5, 24 + open), (50, 26 + open)], mouth)
-        p.fillPolygon([(50, 24 + open), (63.5, 25 + open), (62, 31 + open), (50, 30 + open)], red)
-        for x in [52.0, 56.0, 60.0] {
-            p.fillPolygon([(x, 20), (x + 2.5, 20), (x + 1.2, 23)], .white)
-            p.fillPolygon([(x + 1, 24 + open), (x + 3.5, 24 + open), (x + 2.2, 21.5 + open)], .white)
+        let open = pose == .roar ? 5.0 : 0
+
+        p.fillPolygon([(18, 30), (0, 24), (0, 29), (20, 44)], hide)
+        p.fillPolygon([(4, 28), (0, 26), (0, 28), (6, 32)], hideDark)
+        p.shadedEllipse(cx: 22, cy: 39, rx: 11, ry: 10, hide)
+        p.shadedEllipse(cx: 34, cy: 33, rx: 12, ry: 9.5, hide)
+        p.fillEllipse(cx: 31, cy: 38, rx: 9, ry: 5, belly)
+        for x in stride(from: 8.0, through: 38.0, by: 5) {
+            let y = 30 - (x - 8) * 0.28
+            p.fillPolygon([(x - 1.5, y + 2), (x, y - 2.5), (x + 1.5, y + 2)], ridge)
+        }
+        p.fillPolygon([(40, 24), (46, 14), (56, 20), (46, 36)], hide)
+        p.shadedEllipse(cx: 50, cy: 15, rx: 12.5, ry: 8, hide)
+        p.fillPolygon([(52, 8), (63.5, 12), (63.5, 19), (48, 21)], hide)
+        p.fillPolygon([(42, 10), (50, 6), (56, 9), (52, 12), (44, 13)], hideDark)
+        p.fillPolygon([(46, 20), (63.5, 19), (63.5, 24 + open), (46, 25 + open)], mouth)
+        p.fillPolygon([(46, 24 + open), (63.5, 24 + open), (62, 30 + open), (48, 30 + open), (44, 27 + open)], hide)
+        for x in [49.0, 53.0, 57.0, 61.0] {
+            p.fillPolygon([(x, 19), (x + 3, 19), (x + 1.5, 23)], tooth)
+            p.fillPolygon([(x + 0.5, 25 + open), (x + 3.5, 25 + open), (x + 2, 21.5 + open)], tooth)
         }
         if pose == .roar {
-            p.fillEllipse(cx: 60, cy: 24, rx: 3, ry: 2, fire)
+            p.fillEllipse(cx: 61, cy: 23, rx: 3, ry: 2.5, fire)
         }
         if pose == .stun {
-            p.fillRect(46, 10, 51, 15, eyeYellow)
-            p.line(46, 10, 51, 15, ink); p.line(51, 10, 46, 15, ink)
-            for (x, y) in [(30.0, 3.0), (44.0, 1.0), (58.0, 4.0)] {
+            p.fillRect(48, 12, 53, 16, eyeYellow)
+            p.line(48, 12, 53, 16, ink); p.line(53, 12, 48, 16, ink)
+            for (x, y) in [(34.0, 4.0), (48.0, 1.0), (60.0, 3.0)] {
                 p.fillPolygon([(x, y - 3), (x + 1, y - 1), (x + 3, y), (x + 1, y + 1), (x, y + 3), (x - 1, y + 1), (x - 3, y), (x - 1, y - 1)], eyeYellow)
             }
         } else {
-            p.fillRect(47, 10, 51, 14, eyeYellow); p.fillRect(50, 11, 51, 13, ink)
+            p.fillRect(48, 12, 53, 15, eyeYellow); p.fillRect(51, 12, 52, 15, ink)
+            p.fillRect(46, 11, 54, 11, ridge)
         }
-        p.fillRect(42, 34, 47, 40, red); p.fillRect(46, 40, 48, 42, claw)
+        p.fillRect(40, 36, 43, 41, hide); p.fillRect(43, 40, 45, 41, claw); p.fillRect(43, 38, 45, 38, claw)
         switch pose {
         case .walk1:
-            p.fillRect(16, 50, 23, 60, red); p.fillRect(38, 50, 45, 60, red)
-            p.fillRect(14, 60, 25, 63, red.darkened(0.3)); p.fillRect(36, 60, 47, 63, red.darkened(0.3))
-            p.fillRect(15, 62, 16, 63, claw); p.fillRect(23, 62, 24, 63, claw); p.fillRect(37, 62, 38, 63, claw); p.fillRect(45, 62, 46, 63, claw)
+            p.fillEllipse(cx: 18, cy: 46, rx: 7, ry: 7, hideDark); p.fillRect(12, 50, 18, 60, hideDark)
+            p.fillEllipse(cx: 28, cy: 46, rx: 7, ry: 7, hide); p.fillRect(28, 50, 34, 60, hide)
+            p.fillRect(9, 60, 22, 63, hideDark); p.fillRect(26, 60, 39, 63, hide)
+            for x in [10, 15, 20] { p.fillRect(x, 62, x + 1, 63, claw) }
+            for x in [27, 32, 37] { p.fillRect(x, 62, x + 1, 63, claw) }
         case .walk2:
-            p.fillRect(26, 50, 33, 60, red); p.fillRect(31, 50, 38, 60, red)
-            p.fillRect(24, 60, 40, 63, red.darkened(0.3))
-            p.fillRect(25, 62, 26, 63, claw); p.fillRect(38, 62, 39, 63, claw)
+            p.fillEllipse(cx: 24, cy: 46, rx: 7, ry: 7, hideDark); p.fillRect(21, 50, 27, 60, hideDark)
+            p.fillEllipse(cx: 26, cy: 46, rx: 7, ry: 7, hide); p.fillRect(24, 50, 30, 60, hide)
+            p.fillRect(19, 60, 35, 63, hide)
+            for x in [20, 26, 32] { p.fillRect(x, 62, x + 1, 63, claw) }
         case .leap:
-            p.fillPolygon([(20, 48), (28, 50), (26, 58), (16, 56)], red); p.fillPolygon([(34, 48), (42, 50), (44, 58), (34, 56)], red)
-            p.fillRect(14, 56, 26, 59, red.darkened(0.3)); p.fillRect(34, 56, 46, 59, red.darkened(0.3))
+            p.fillEllipse(cx: 20, cy: 47, rx: 7, ry: 7, hideDark); p.fillPolygon([(14, 50), (22, 52), (28, 58), (20, 60)], hideDark)
+            p.fillEllipse(cx: 28, cy: 46, rx: 7, ry: 7, hide); p.fillPolygon([(24, 50), (32, 51), (38, 57), (30, 59)], hide)
+            p.fillRect(18, 58, 30, 61, hideDark); p.fillRect(28, 57, 40, 60, hide)
         default:
-            p.fillRect(22, 50, 29, 60, red); p.fillRect(34, 50, 41, 60, red)
-            p.fillRect(20, 60, 31, 63, red.darkened(0.3)); p.fillRect(32, 60, 43, 63, red.darkened(0.3))
-            p.fillRect(21, 62, 22, 63, claw); p.fillRect(29, 62, 30, 63, claw); p.fillRect(33, 62, 34, 63, claw); p.fillRect(41, 62, 42, 63, claw)
+            p.fillEllipse(cx: 20, cy: 46, rx: 7, ry: 7, hideDark); p.fillRect(15, 50, 21, 60, hideDark)
+            p.fillEllipse(cx: 28, cy: 46, rx: 7, ry: 7, hide); p.fillRect(26, 50, 32, 60, hide)
+            p.fillRect(12, 60, 25, 63, hideDark); p.fillRect(24, 60, 37, 63, hide)
+            for x in [13, 18, 23] { p.fillRect(x, 62, x + 1, 63, claw) }
+            for x in [25, 30, 35] { p.fillRect(x, 62, x + 1, 63, claw) }
         }
         return finish(&p)
     }
