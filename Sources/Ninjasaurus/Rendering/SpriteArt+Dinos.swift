@@ -181,7 +181,7 @@ extension SpriteArt {
         let hide = PixelColor(0x5C7C40), hideDark = PixelColor(0x3C5430), belly = PixelColor(0xC4BC98), ridge = PixelColor(0x2C4024)
         let mouth = PixelColor(0x6C1420), tooth = PixelColor(0xF4F0E0), eyeYellow = PixelColor(0xF8D040), fire = Colors.orange
         var p = PixelPainter(width: 64, height: 64)
-        let open = pose == .roar ? 5.0 : 0
+        let open = pose == .roar ? 6.0 : 2.5
 
         p.fillPolygon([(18, 30), (0, 24), (0, 29), (20, 44)], hide)
         p.fillPolygon([(4, 28), (0, 26), (0, 28), (6, 32)], hideDark)
