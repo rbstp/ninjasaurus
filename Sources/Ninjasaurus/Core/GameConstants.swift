@@ -37,11 +37,11 @@ enum GameConstants {
     // MARK: Hitboxes
     static let smallPlayerSize = Vec2(x: 12, y: 15)
     static let bigPlayerSize = Vec2(x: 12, y: 30)
-    static let enemySize = Vec2(x: 14, y: 14)
-    static let pteroSize = Vec2(x: 14, y: 12)
+    static let enemySize = Vec2(x: 18, y: 18)
+    static let pteroSize = Vec2(x: 18, y: 15)
     static let itemSize = Vec2(x: 14, y: 14)
     static let shurikenSize = Vec2(x: 8, y: 8)
-    static let rexSize = Vec2(x: 28, y: 30)
+    static let rexSize = Vec2(x: 35, y: 38)
     static let fireballSize = Vec2(x: 14, y: 8)
 
     // MARK: Enemies

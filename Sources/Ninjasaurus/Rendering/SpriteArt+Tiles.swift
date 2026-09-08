@@ -186,16 +186,20 @@ extension SpriteArt {
     }
 
     static func coin(rx: Double) -> PixelSprite {
-        let gold = Colors.gold, dark = Colors.darkGold, pale = Colors.paleGold
+        let paper = PixelColor(0xF8E0A0), edge = PixelColor(0x8C5A18), roll = PixelColor(0xD8B060), ribbon = Colors.red
         var p = PixelPainter(width: 32, height: 32)
-        p.fillEllipse(cx: 16, cy: 16, rx: rx + 1.5, ry: 13.5, PixelColor(0x805010))
-        p.fillEllipse(cx: 16, cy: 16, rx: rx, ry: 12, dark)
-        p.fillEllipse(cx: 15.5, cy: 15.5, rx: max(1, rx - 1.5), ry: 10.5, gold)
+        let x0 = 16 - rx, x1 = 16 + rx
+        p.fillRect(Int(x0.rounded()), 6, Int(x1.rounded()) - 1, 26, paper)
+        p.fillEllipse(cx: 16, cy: 6, rx: rx, ry: 3, roll)
+        p.fillEllipse(cx: 16, cy: 26, rx: rx, ry: 3, roll)
         if rx > 4 {
-            p.fillEllipse(cx: 16, cy: 16, rx: rx - 3.5, ry: 8, dark)
-            p.fillEllipse(cx: 16, cy: 16, rx: rx - 4.5, ry: 7, gold)
-            p.fillEllipse(cx: 13.5, cy: 10, rx: rx * 0.25, ry: 2.5, pale)
+            p.fillEllipse(cx: 16, cy: 6, rx: rx * 0.45, ry: 1.4, paper)
+            p.fillEllipse(cx: 16, cy: 26, rx: rx * 0.45, ry: 1.4, paper)
+            p.fillRect(Int(x0.rounded()) + 1, 9, Int(x0.rounded()) + 2, 23, .white)
         }
+        p.fillRect(Int(x0.rounded()), 14, Int(x1.rounded()) - 1, 18, ribbon)
+        p.fillRect(Int(x0.rounded()), 18, Int(x1.rounded()) - 1, 18, Colors.darkRed)
+        p.outline(edge)
         return p.sprite(scale: 2)
     }
 
@@ -352,9 +356,10 @@ extension SpriteArt {
         }
         out["hud.heartEmpty"] = out["hud.heart"]!.recolored { _ in PixelColor(0x585868) }
         out["hud.coin"] = icon { p in
-            p.fillEllipse(cx: 8, cy: 8, rx: 6, ry: 7.5, Colors.darkGold)
-            p.fillEllipse(cx: 7.5, cy: 7.5, rx: 4.5, ry: 6, Colors.gold)
-            p.fillRect(5, 4, 6, 6, Colors.paleGold)
+            p.fillRect(4, 2, 11, 13, PixelColor(0xF8E0A0))
+            p.fillEllipse(cx: 8, cy: 2, rx: 4.5, ry: 1.8, PixelColor(0xD8B060))
+            p.fillEllipse(cx: 8, cy: 13, rx: 4.5, ry: 1.8, PixelColor(0xD8B060))
+            p.fillRect(4, 6, 11, 8, Colors.red)
         }
         out["hud.lock"] = icon { p in
             p.fillEllipse(cx: 8, cy: 6, rx: 5, ry: 5, PixelColor(0xA0A8B8))

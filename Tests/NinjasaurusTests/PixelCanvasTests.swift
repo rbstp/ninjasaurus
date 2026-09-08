@@ -83,9 +83,11 @@ final class PixelCanvasTests: XCTestCase {
         let layout = try AtlasBuilder.buildFitting(SpriteArt.registry)
         XCTAssertEqual(layout.rects.count, SpriteArt.registry.count)
         XCTAssertLessThanOrEqual(layout.canvas.width, 2048)
-        for name in ["ninja.small.idle", "ninja.big.idle", "raptor.walk1", "rex.idle", "tile.brick", "item.onigiri", "hud.heart"] {
+        for name in ["ninja.small.idle", "ninja.big.idle", "tile.brick", "item.onigiri", "hud.heart"] {
             XCTAssertEqual(SpriteArt.registry[name]?.scale, 2, name)
         }
+        XCTAssertEqual(SpriteArt.registry["raptor.walk1"]?.unitHeight, 20)
+        XCTAssertEqual(SpriteArt.registry["rex.idle"]?.unitHeight, 40)
         XCTAssertEqual(SpriteArt.registry["ninja.small.idle"]?.unitHeight, 16)
         XCTAssertEqual(SpriteArt.registry["ninja.big.idle"]?.unitHeight, 32)
         XCTAssertEqual(SpriteArt.registry["tile.brick"]?.unitWidth, 16)

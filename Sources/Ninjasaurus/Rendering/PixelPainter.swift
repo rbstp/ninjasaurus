@@ -195,7 +195,7 @@ struct PixelPainter {
         return out
     }
 
-    func sprite(scale: Int = 2) -> PixelSprite {
+    func sprite(scale: Double = 2) -> PixelSprite {
         PixelSprite(width: width, height: height, pixels: pixels, scale: scale)
     }
 }

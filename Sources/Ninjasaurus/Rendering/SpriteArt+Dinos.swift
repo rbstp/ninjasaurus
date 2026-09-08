@@ -29,10 +29,12 @@ extension SpriteArt {
         return out
     }()
 
+    static let dinoScale = 1.6
+
     private static func finish(_ p: inout PixelPainter) -> PixelSprite {
         p.outline(ink)
         p.bevel(outline: ink)
-        return p.sprite(scale: 2)
+        return p.sprite(scale: dinoScale)
     }
 
     private static func eye(_ p: inout PixelPainter, _ x: Int, _ y: Int, _ size: Int = 2, iris: PixelColor = .white) {
