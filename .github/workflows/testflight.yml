@@ -96,15 +96,15 @@ jobs:
 
       - name: import the signing certificate and profile
         run: |
-          # Secrets pasted with line wraps or spaces still decode.
-          decode() { tr -d '\n\r\t ' | base64 --decode; }
-          check() {
-            [ -s "$2" ] || { echo "$1 did not decode to a file; set it with: base64 -i <file> | gh secret set $1"; exit 1; }
+          # decode NAME VALUE FILE: whitespace-tolerant base64, fails naming the secret.
+          decode() {
+            printf '%s' "$2" | tr -d '\n\r\t ' | base64 --decode > "$3" || {
+              echo "$1 is not valid base64; set it with: base64 -i <file> | gh secret set $1"; exit 1; }
+            [ -s "$3" ] || { echo "$1 is empty; set it with: base64 -i <file> | gh secret set $1"; exit 1; }
           }
           keychain="$RUNNER_TEMP/signing.keychain-db"
           password="$(openssl rand -base64 24)"
-          printf '%s' "$APPLE_DIST_CERT_P12" | decode > "$RUNNER_TEMP/cert.p12" || true
-          check APPLE_DIST_CERT_P12 "$RUNNER_TEMP/cert.p12"
+          decode APPLE_DIST_CERT_P12 "$APPLE_DIST_CERT_P12" "$RUNNER_TEMP/cert.p12"
           security create-keychain -p "$password" "$keychain"
           security set-keychain-settings "$keychain"
           security unlock-keychain -p "$password" "$keychain"
@@ -120,15 +120,13 @@ jobs:
 
           profiles="$HOME/Library/MobileDevice/Provisioning Profiles"
           mkdir -p "$profiles"
-          printf '%s' "$APPLE_PROVISIONING_PROFILE" | decode > "$RUNNER_TEMP/profile.mobileprovision" || true
-          check APPLE_PROVISIONING_PROFILE "$RUNNER_TEMP/profile.mobileprovision"
+          decode APPLE_PROVISIONING_PROFILE "$APPLE_PROVISIONING_PROFILE" "$RUNNER_TEMP/profile.mobileprovision"
           plist="$(security cms -D -i "$RUNNER_TEMP/profile.mobileprovision")" || {
             echo "APPLE_PROVISIONING_PROFILE is not a .mobileprovision file"; exit 1; }
           uuid="$(printf '%s' "$plist" | /usr/libexec/PlistBuddy -c 'Print UUID' /dev/stdin)"
           printf '%s' "$plist" | /usr/libexec/PlistBuddy -c 'Print Name' -c 'Print Entitlements:application-identifier' -c 'Print ExpirationDate' /dev/stdin
           mv "$RUNNER_TEMP/profile.mobileprovision" "$profiles/$uuid.mobileprovision"
-          printf '%s' "$APPLE_KEY_P8" | decode > "$RUNNER_TEMP/AuthKey.p8" || true
-          check APPLE_KEY_P8 "$RUNNER_TEMP/AuthKey.p8"
+          decode APPLE_KEY_P8 "$APPLE_KEY_P8" "$RUNNER_TEMP/AuthKey.p8"
         env:
           APPLE_DIST_CERT_P12: ${{ secrets.APPLE_DIST_CERT_P12 }}
           APPLE_DIST_CERT_PASSWORD: ${{ secrets.APPLE_DIST_CERT_PASSWORD }}
