@@ -1,0 +1,57 @@
+name: ci
+run-name: "[ci] - testing ${{ github.ref_name }}"
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - '.github/**'
+      - 'README.md'
+
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    runs-on: macos-26
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v7
+
+      - name: install xcodegen
+        run: brew install xcodegen
+
+      - name: generate the project
+        run: xcodegen generate
+
+      - name: pick a simulator
+        id: simulator
+        run: |
+          name="$(xcrun simctl list devices available -j \
+            | jq -r '.devices | to_entries[] | select(.key | contains("iOS")) | .value[] | select(.name | startswith("iPhone")) | .name' \
+            | sort -V | tail -1)"
+          [ -n "$name" ] || { echo "no iPhone simulator on this runner"; exit 1; }
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+
+      - name: test
+        run: |
+          xcodebuild test -project Ninjasaurus.xcodeproj -scheme Ninjasaurus \
+            -destination "platform=iOS Simulator,name=$SIMULATOR" \
+            -derivedDataPath .build/DerivedData -resultBundlePath .build/tests.xcresult \
+            CODE_SIGNING_ALLOWED=NO
+        env:
+          SIMULATOR: ${{ steps.simulator.outputs.name }}
+
+      - name: upload the test results
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: tests.xcresult
+          path: .build/tests.xcresult

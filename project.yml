@@ -1,0 +1,77 @@
+name: Ninjasaurus
+
+options:
+  bundleIdPrefix: dev.rbstp
+  createIntermediateGroups: true
+  generateEmptyDirectories: false
+  deploymentTarget:
+    iOS: "18.0"
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    DEVELOPMENT_TEAM: RM3UT3MMSR
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    # Overridden from the command line by the TestFlight workflow.
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+
+targets:
+  Ninjasaurus:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources/Ninjasaurus
+      - path: Resources/Assets.xcassets
+      - path: Resources/PrivacyInfo.xcprivacy
+      # Folder reference: the level files ship as Ninjasaurus.app/Levels/*.txt
+      - path: Resources/Levels
+        type: folder
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.rbstp.ninjasaurus
+        PRODUCT_NAME: Ninjasaurus
+        INFOPLIST_FILE: Resources/Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        SUPPORTS_MACCATALYST: NO
+        SUPPORTED_PLATFORMS: "iphoneos iphonesimulator"
+      configs:
+        Debug:
+          CODE_SIGN_STYLE: Automatic
+          CODE_SIGN_IDENTITY: "Apple Development"
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: "Apple Distribution"
+          PROVISIONING_PROFILE_SPECIFIER: "Ninjasaurus App Store"
+
+  NinjasaurusTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests/NinjasaurusTests
+    dependencies:
+      - target: Ninjasaurus
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGN_STYLE: Automatic
+
+schemes:
+  Ninjasaurus:
+    build:
+      targets:
+        Ninjasaurus: all
+        NinjasaurusTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      gatherCoverageData: false
+      targets:
+        - NinjasaurusTests
+    archive:
+      config: Release

@@ -1,0 +1,164 @@
+name: testflight
+run-name: "[testflight] - shipping ${{ github.event.pull_request.merge_commit_sha || github.ref_name }}"
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - master
+    paths-ignore:
+      - '.github/**'
+      - 'README.md'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: version to ship, without the leading v (e.g. 0.3.0)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build-ship:
+    concurrency: testflight
+    environment:
+      name: testflight
+      url: https://appstoreconnect.apple.com/apps
+    if: >-
+      ${{ github.event_name == 'workflow_dispatch'
+          || (github.event.pull_request.merged
+              && !contains(github.event.pull_request.title, '[skip-release]')) }}
+    runs-on: macos-26
+    permissions:
+      contents: write
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.merge_commit_sha || github.ref }}
+
+      - name: work out the version
+        id: version
+        run: |
+          if [ -n "$INPUT_VERSION" ]; then
+            version="$INPUT_VERSION"
+          else
+            latest="$(git tag --list 'v*' --sort=-v:refname | head -1)"
+            IFS=. read -r major minor patch <<< "${latest:-v0.0.0}"
+            major="${major#v}"
+            # Every commit since the last tag counts, so a cancelled pending run cannot lose a feat bump.
+            range="${latest:+$latest..}HEAD"
+            if { git log --format='%s%n%b' "$range"; printf '%s\n' "$TITLE"; } | grep -qiE '^(\[[A-Z]+-[0-9]+\] )?feat[(!:]'; then
+              minor=$((minor + 1)); patch=0
+            else
+              patch=$((patch + 1))
+            fi
+            version="$major.$minor.$patch"
+          fi
+          echo "shipping $version build $GITHUB_RUN_NUMBER (previous tag: ${latest:-none})"
+          {
+            echo "version=$version"
+            echo "tag=v$version"
+          } >> "$GITHUB_OUTPUT"
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+          TITLE: ${{ github.event.pull_request.title }}
+
+      - name: check for the signing secrets
+        run: |
+          missing=
+          for name in APPLE_DIST_CERT_P12 APPLE_DIST_CERT_PASSWORD APPLE_PROVISIONING_PROFILE APPLE_KEY_P8 APPLE_KEY_ID APPLE_ISSUER_ID; do
+            eval "value=\$$name"
+            [ -n "$value" ] || missing="$missing $name"
+          done
+          [ -z "$missing" ] || {
+            echo "unset repository secrets:$missing"
+            echo "See README.md, Releasing to TestFlight, or run scripts/setup-apple.sh."
+            exit 1
+          }
+        env:
+          APPLE_DIST_CERT_P12: ${{ secrets.APPLE_DIST_CERT_P12 }}
+          APPLE_DIST_CERT_PASSWORD: ${{ secrets.APPLE_DIST_CERT_PASSWORD }}
+          APPLE_PROVISIONING_PROFILE: ${{ secrets.APPLE_PROVISIONING_PROFILE }}
+          APPLE_KEY_P8: ${{ secrets.APPLE_KEY_P8 }}
+          APPLE_KEY_ID: ${{ secrets.APPLE_KEY_ID }}
+          APPLE_ISSUER_ID: ${{ secrets.APPLE_ISSUER_ID }}
+
+      - name: install xcodegen
+        run: brew install xcodegen
+
+      - name: generate the project
+        run: xcodegen generate
+
+      - name: import the signing certificate and profile
+        run: |
+          keychain="$RUNNER_TEMP/signing.keychain-db"
+          password="$(openssl rand -base64 24)"
+          printf '%s' "$APPLE_DIST_CERT_P12" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          security create-keychain -p "$password" "$keychain"
+          security set-keychain-settings "$keychain"
+          security unlock-keychain -p "$password" "$keychain"
+          security import "$RUNNER_TEMP/cert.p12" -k "$keychain" -P "$APPLE_DIST_CERT_PASSWORD" \
+            -T /usr/bin/codesign -f pkcs12
+          # Without a partition list, codesign's first use of the key blocks on a UI prompt.
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$password" \
+            "$keychain" > /dev/null
+          security list-keychains -d user | tr -d '"' \
+            | xargs security list-keychains -d user -s "$keychain"
+          rm -f "$RUNNER_TEMP/cert.p12"
+          security find-identity -v -p codesigning "$keychain"
+
+          profiles="$HOME/Library/MobileDevice/Provisioning Profiles"
+          mkdir -p "$profiles"
+          printf '%s' "$APPLE_PROVISIONING_PROFILE" | base64 --decode > "$RUNNER_TEMP/profile.mobileprovision"
+          uuid="$(security cms -D -i "$RUNNER_TEMP/profile.mobileprovision" | /usr/libexec/PlistBuddy -c 'Print UUID' /dev/stdin)"
+          mv "$RUNNER_TEMP/profile.mobileprovision" "$profiles/$uuid.mobileprovision"
+          printf '%s' "$APPLE_KEY_P8" | base64 --decode > "$RUNNER_TEMP/AuthKey.p8"
+        env:
+          APPLE_DIST_CERT_P12: ${{ secrets.APPLE_DIST_CERT_P12 }}
+          APPLE_DIST_CERT_PASSWORD: ${{ secrets.APPLE_DIST_CERT_PASSWORD }}
+          APPLE_PROVISIONING_PROFILE: ${{ secrets.APPLE_PROVISIONING_PROFILE }}
+          APPLE_KEY_P8: ${{ secrets.APPLE_KEY_P8 }}
+
+      - name: archive
+        run: |
+          xcodebuild archive -project Ninjasaurus.xcodeproj -scheme Ninjasaurus -configuration Release \
+            -destination 'generic/platform=iOS' -derivedDataPath .build/DerivedData \
+            -archivePath .build/Ninjasaurus.xcarchive \
+            MARKETING_VERSION="$VERSION" CURRENT_PROJECT_VERSION="$GITHUB_RUN_NUMBER"
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+
+      - name: upload to testflight
+        run: |
+          xcodebuild -exportArchive -archivePath .build/Ninjasaurus.xcarchive \
+            -exportOptionsPlist scripts/ExportOptions.plist -exportPath .build/export \
+            -authenticationKeyPath "$RUNNER_TEMP/AuthKey.p8" \
+            -authenticationKeyID "$APPLE_KEY_ID" -authenticationKeyIssuerID "$APPLE_ISSUER_ID"
+        env:
+          APPLE_KEY_ID: ${{ secrets.APPLE_KEY_ID }}
+          APPLE_ISSUER_ID: ${{ secrets.APPLE_ISSUER_ID }}
+
+      - name: tag the release
+        run: |
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "$TAG already exists"
+            exit 0
+          fi
+          git tag "$TAG" "$SHA"
+          git push origin "refs/tags/$TAG"
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+          SHA: ${{ github.event.pull_request.merge_commit_sha || github.sha }}
+
+      - name: forget the signing material
+        if: ${{ !cancelled() }}
+        run: |
+          rm -f "$RUNNER_TEMP/AuthKey.p8"
+          if [ -f "$RUNNER_TEMP/signing.keychain-db" ]; then
+            security delete-keychain "$RUNNER_TEMP/signing.keychain-db"
+          fi
