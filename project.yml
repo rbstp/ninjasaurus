@@ -6,6 +6,7 @@ options:
   generateEmptyDirectories: false
   deploymentTarget:
     iOS: "18.0"
+  xcodeVersion: "27.0"
 
 settings:
   base:
@@ -13,6 +14,9 @@ settings:
     SWIFT_STRICT_CONCURRENCY: complete
     DEVELOPMENT_TEAM: RM3UT3MMSR
     ENABLE_USER_SCRIPT_SANDBOXING: YES
+    ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: YES
+    STRING_CATALOG_GENERATE_SYMBOLS: YES
+    SWIFT_EMIT_LOC_STRINGS: YES
     # Overridden from the command line by the TestFlight workflow.
     MARKETING_VERSION: "0.1.0"
     CURRENT_PROJECT_VERSION: "1"
