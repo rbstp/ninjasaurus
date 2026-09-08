@@ -13,6 +13,7 @@ final class TitleScene: BaseScene {
     private var transitioning = false
 
     override func didMove(to view: SKView) {
+        context.audio.playMusic(Music.title)
         let layers = BackgroundPainter.layers(for: .grass)
         sky = SKSpriteNode(texture: layers.sky, size: size)
         sky.anchorPoint = .zero

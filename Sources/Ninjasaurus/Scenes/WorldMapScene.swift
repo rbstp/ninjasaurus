@@ -11,12 +11,14 @@ final class WorldMapScene: BaseScene {
     private var marker: SKSpriteNode!
     private var statusText: PixelTextNode!
     private var bestText: PixelTextNode!
+    private var musicText: PixelTextNode!
     private var titleText: PixelTextNode!
     private var transitioning = false
     private let ground = SKNode()
     private var nodeSpots: [SKShapeNode] = []
 
     override func didMove(to view: SKView) {
+        context.audio.playMusic(Music.title)
         let layers = BackgroundPainter.layers(for: .grass)
         let sky = SKSpriteNode(texture: layers.sky, size: size)
         sky.anchorPoint = .zero
@@ -36,6 +38,8 @@ final class WorldMapScene: BaseScene {
         addChild(statusText)
         bestText = PixelTextNode("", textures: context.textures, color: SKColor(red: 1, green: 0.9, blue: 0.4, alpha: 1), alignment: .center)
         addChild(bestText)
+        musicText = PixelTextNode(context.musicLabel, textures: context.textures, color: .white, alignment: .right)
+        addChild(musicText)
 
         let unlocked = context.progress.unlockedLevelCount
         let icons = ["tile.grass.groundTop", "tile.cave.groundTop", "tile.cloud", "tile.hazard.lava1"]
@@ -75,6 +79,7 @@ final class WorldMapScene: BaseScene {
         titleText.position = CGPoint(x: size.width / 2, y: size.height - CGFloat(safeInsets.top) - 28)
         statusText.position = CGPoint(x: size.width / 2, y: size.height - CGFloat(safeInsets.top) - 44)
         bestText.position = CGPoint(x: size.width / 2, y: CGFloat(safeInsets.bottom) + 14)
+        musicText.position = CGPoint(x: size.width - CGFloat(safeInsets.right) - 10, y: CGFloat(safeInsets.bottom) + 14)
         let usable = size.width - CGFloat(safeInsets.left + safeInsets.right) - 60
         let startX = CGFloat(safeInsets.left) + 30 + usable * 0.05
         let step = usable * 0.9 / CGFloat(max(1, LevelCatalog.count - 1))
@@ -103,6 +108,13 @@ final class WorldMapScene: BaseScene {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard !transitioning, let touch = touches.first else { return }
         let point = touch.location(in: self)
+        let musicFrame = CGRect(x: musicText.position.x - musicText.width - 12, y: musicText.position.y - 12, width: musicText.width + 24, height: 32)
+        if musicFrame.contains(point) {
+            context.audio.play(.uiTap)
+            context.toggleMusic()
+            musicText.text = context.musicLabel
+            return
+        }
         for entry in mapNodes {
             let frame = CGRect(x: entry.node.position.x - 24, y: entry.node.position.y - 36, width: 48, height: 60)
             guard frame.contains(point) else { continue }

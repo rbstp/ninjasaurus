@@ -4,6 +4,7 @@ struct ProgressStore {
     private let defaults: UserDefaults
     private let unlockedKey = "unlockedLevelCount"
     private let bestScoreKey = "bestScore"
+    private let musicKey = "musicEnabled"
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -17,6 +18,11 @@ struct ProgressStore {
     var bestScore: Int {
         get { defaults.integer(forKey: bestScoreKey) }
         nonmutating set { defaults.set(newValue, forKey: bestScoreKey) }
+    }
+
+    var musicEnabled: Bool {
+        get { defaults.object(forKey: musicKey) == nil ? true : defaults.bool(forKey: musicKey) }
+        nonmutating set { defaults.set(newValue, forKey: musicKey) }
     }
 
     func unlock(levelIndex: Int) {

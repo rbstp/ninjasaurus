@@ -48,6 +48,7 @@ final class GameScene: BaseScene {
     }
 
     override func didMove(to view: SKView) {
+        context.audio.playMusic(Music.song(for: level.theme))
         backgroundColor = .black
         addChild(worldNode)
         camera = cameraNode
@@ -200,6 +201,7 @@ final class GameScene: BaseScene {
             case .playerHurt:
                 audio.play(.hurt)
             case .playerDied:
+                audio.pauseMusic()
                 audio.play(.die)
             case .checkpointReached:
                 audio.play(.checkpoint)
@@ -237,6 +239,7 @@ final class GameScene: BaseScene {
                 if context.session.loseLife() {
                     outcome = .respawn(framesLeft: 30)
                 } else {
+                    context.audio.stopMusic()
                     context.audio.play(.uiTap)
                     showOverlay(title: "GAME OVER", subtitle: nil, buttons: [], titleColor: .systemRed)
                     outcome = .gameOver(framesLeft: 150)
@@ -267,6 +270,7 @@ final class GameScene: BaseScene {
     }
 
     private func levelCleared() {
+        context.audio.stopMusic()
         context.progress.unlock(levelIndex: levelIndex + 1)
         context.progress.recordScore(context.session.score)
         context.session.checkpoint = nil
@@ -282,6 +286,7 @@ final class GameScene: BaseScene {
 
     private func respawn() {
         outcome = .none
+        context.audio.resumeMusic()
         world = GameWorld(level: level, startAt: context.session.checkpoint, viewSize: Vec2(x: size.width, y: size.height))
         tileLayer.reset()
         entitySync.removeAll()
@@ -321,11 +326,13 @@ final class GameScene: BaseScene {
     private func pauseGame() {
         guard !isPausedByUser, case .none = outcome else { return }
         isPausedByUser = true
-        showOverlay(title: "PAUSED", subtitle: nil, buttons: [("RESUME", .resume), ("MAP", .quit)])
+        context.audio.pauseMusic()
+        showOverlay(title: "PAUSED", subtitle: nil, buttons: [("RESUME", .resume), (context.musicLabel, .toggleMusic), ("MAP", .quit)])
     }
 
     private func resumeGame() {
         isPausedByUser = false
+        context.audio.resumeMusic()
         hideOverlay()
         clock.reset()
     }
@@ -362,6 +369,11 @@ final class GameScene: BaseScene {
                     context.audio.play(.uiTap)
                     context.session.resetForNewRun()
                     goToMap()
+                    return
+                case .toggleMusic:
+                    context.audio.play(.uiTap)
+                    context.toggleMusic()
+                    overlay.setLabel(context.musicLabel, for: .toggleMusic)
                     return
                 case .none:
                     break

@@ -4,10 +4,11 @@ final class OverlayNode: SKNode {
     enum Action: Equatable {
         case resume
         case quit
+        case toggleMusic
         case none
     }
 
-    private var buttons: [(node: SKShapeNode, action: Action)] = []
+    private var buttons: [(node: SKShapeNode, action: Action, label: PixelTextNode)] = []
     let dim: SKSpriteNode
     private let title: PixelTextNode
     private let subtitle: PixelTextNode?
@@ -23,7 +24,7 @@ final class OverlayNode: SKNode {
         addChild(title)
         if let subtitle { addChild(subtitle) }
         for (label, action) in buttonSpecs {
-            let button = SKShapeNode(rectOf: CGSize(width: 96, height: 28), cornerRadius: 6)
+            let button = SKShapeNode(rectOf: CGSize(width: 90, height: 28), cornerRadius: 6)
             button.fillColor = SKColor(red: 0.85, green: 0.16, blue: 0.16, alpha: 1)
             button.strokeColor = .white
             button.lineWidth = 1
@@ -31,7 +32,7 @@ final class OverlayNode: SKNode {
             text.position = CGPoint(x: 0, y: -3.5)
             button.addChild(text)
             addChild(button)
-            buttons.append((button, action))
+            buttons.append((button, action, text))
         }
         layout()
     }
@@ -44,10 +45,16 @@ final class OverlayNode: SKNode {
     private func layout() {
         title.position = CGPoint(x: 0, y: buttons.isEmpty ? 4 : 30)
         subtitle?.position = CGPoint(x: 0, y: title.position.y - 16)
-        let spacing: CGFloat = 112
+        let spacing: CGFloat = 100
         let startX = -spacing * CGFloat(buttons.count - 1) / 2
         for (index, button) in buttons.enumerated() {
             button.node.position = CGPoint(x: startX + spacing * CGFloat(index), y: -24)
+        }
+    }
+
+    func setLabel(_ text: String, for action: Action) {
+        for button in buttons where button.action == action {
+            button.label.text = text
         }
     }
 
