@@ -81,7 +81,7 @@ enum GameConstants {
 
     // MARK: Scoring / lives
     static let startingLives = 5
-    static let coinsPerLife = 100
+    static let coinsPerLife = 50
     static let coinScore = 200
     static let stompScore = 100
     static let powerUpScore = 1000

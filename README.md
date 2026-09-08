@@ -42,7 +42,7 @@ Sources/Ninjasaurus/
   Audio/      tone synth, sound recipes, AVAudioEngine player
 Resources/Levels/   one text file per level
 Tests/              XCTest suite for the pure Swift parts
-scripts/            icon generator, Apple setup checklist, export options
+scripts/            icon generator (scripts/icon), Apple setup checklist, export options
 ```
 
 The simulation never imports SpriteKit. `GameWorld.step` takes an input state and returns events, which is what the tests drive.
