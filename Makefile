@@ -78,7 +78,7 @@ upload:
 lsp: project
 	@command -v xcode-build-server >/dev/null || { echo "brew install xcode-build-server"; exit 1; }
 	xcode-build-server config -project $(PROJECT) -scheme $(SCHEME)
-	$(XCB) -destination '$(DEST)' -configuration Debug CODE_SIGNING_ALLOWED=NO build
+	xcodebuild -project $(PROJECT) -scheme $(SCHEME) -destination '$(DEST)' -configuration Debug CODE_SIGNING_ALLOWED=NO build
 
 clean:
 	rm -rf $(BUILD) $(PROJECT) buildServer.json
