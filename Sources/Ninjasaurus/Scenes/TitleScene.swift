@@ -40,6 +40,7 @@ final class TitleScene: BaseScene {
         ninja.setScale(1.5)
         ninja.zPosition = 5
         addChild(ninja)
+        startHopping()
         spawnNextEnemy()
         layoutForSize()
     }
@@ -68,6 +69,19 @@ final class TitleScene: BaseScene {
         ninja.position = CGPoint(x: centerX - 110, y: 32)
     }
 
+    private func startHopping() {
+        let up = SKAction.moveBy(x: 0, y: 36, duration: 0.32)
+        up.timingMode = .easeOut
+        let down = SKAction.moveBy(x: 0, y: -36, duration: 0.3)
+        down.timingMode = .easeIn
+        ninja.run(SKAction.repeatForever(SKAction.sequence([
+            .wait(forDuration: 0.9),
+            .setTexture(context.textures.texture("ninja.big.jump@shuriken")),
+            up, down,
+            .setTexture(context.textures.texture("ninja.big.idle@shuriken")),
+        ])), withKey: "hop")
+    }
+
     private func spawnNextEnemy() {
         let kind = enemyKinds[enemyIndex % enemyKinds.count]
         enemyIndex += 1
@@ -91,8 +105,14 @@ final class TitleScene: BaseScene {
 
     private func throwShuriken() {
         guard let enemy else { return }
+        ninja.removeAction(forKey: "hop")
+        ninja.position.y = 32
         ninja.texture = context.textures.texture("ninja.big.throw@shuriken")
-        ninja.run(SKAction.sequence([.wait(forDuration: 0.3), .setTexture(context.textures.texture("ninja.big.idle@shuriken"))]))
+        ninja.run(SKAction.sequence([
+            .wait(forDuration: 0.35),
+            .setTexture(context.textures.texture("ninja.big.idle@shuriken")),
+            .run { [weak self] in MainActor.assumeIsolated { self?.startHopping() } },
+        ]))
         let shuriken = context.textures.sprite("shuriken1", anchor: CGPoint(x: 0.5, y: 0.5))
         shuriken.setScale(1.5)
         shuriken.zPosition = 6
