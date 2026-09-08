@@ -4,7 +4,7 @@
 #   make test       unit tests on the simulator
 #   make run        build, install and launch on the simulator
 #   make shot       screenshot of the booted simulator into .build/
-#   make icon       regenerate the app icon PNG from scripts/GenerateIcon.swift
+#   make icon       regenerate the app icon PNG from the game's sprite art
 #   make archive    Release archive (needs the Apple Distribution cert + profile)
 #   make upload     upload the archive to TestFlight (needs API_KEY, API_KEY_ID, API_ISSUER)
 
@@ -48,8 +48,17 @@ shot:
 	@mkdir -p $(BUILD)
 	xcrun simctl io booted screenshot "$(BUILD)/shot-$$(date +%H%M%S).png"
 
+ICON_SOURCES := scripts/icon/main.swift \
+	Sources/Ninjasaurus/Core/Geometry.swift Sources/Ninjasaurus/Core/GameConstants.swift Sources/Ninjasaurus/Core/SeededRandom.swift \
+	Sources/Ninjasaurus/Core/GameEvent.swift Sources/Ninjasaurus/Levels/Tile.swift \
+	Sources/Ninjasaurus/Rendering/PixelColor.swift Sources/Ninjasaurus/Rendering/PixelSprite.swift Sources/Ninjasaurus/Rendering/PixelCanvas.swift \
+	Sources/Ninjasaurus/Rendering/PixelPainter.swift Sources/Ninjasaurus/Rendering/PixelFont.swift Sources/Ninjasaurus/Rendering/SpriteArt.swift \
+	Sources/Ninjasaurus/Rendering/SpriteArt+Ninja.swift Sources/Ninjasaurus/Rendering/SpriteArt+Dinos.swift Sources/Ninjasaurus/Rendering/SpriteArt+Tiles.swift
+
 icon:
-	swift scripts/GenerateIcon.swift "$(ICON)"
+	@mkdir -p $(BUILD)
+	swiftc -O -o $(BUILD)/generate-icon $(ICON_SOURCES)
+	$(BUILD)/generate-icon "$(ICON)"
 
 archive: project
 	$(XCB) -destination 'generic/platform=iOS' -configuration Release \

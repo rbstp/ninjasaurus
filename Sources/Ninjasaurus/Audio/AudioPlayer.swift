@@ -34,6 +34,7 @@ final class AudioPlayer {
     func play(_ sfx: Sfx) {
         guard !isMuted, let buffer = buffers[sfx] else { return }
         if !engine.isRunning {
+            try? AVAudioSession.sharedInstance().setActive(true)
             do {
                 try engine.start()
             } catch {

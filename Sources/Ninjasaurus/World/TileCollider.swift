@@ -61,6 +61,18 @@ enum TileCollider {
         return YResult(rect: moved, landed: false, hitCeiling: false, ceilingRow: row, ceilingColumns: [])
     }
 
+    static func hazardAhead(x: Double, footY: Double, in map: TileMap) -> Bool {
+        let col = Tiles.index(x)
+        let footRow = Tiles.index(footY + epsilon)
+        if map[col, footRow].isHazard { return true }
+        for row in stride(from: footRow - 1, through: footRow - 3, by: -1) {
+            let tile = map[col, row]
+            if tile.isHazard { return true }
+            if tile.isSolid || tile.isOneWay { return false }
+        }
+        return false
+    }
+
     static func hasFloor(x: Double, belowY y: Double, in map: TileMap) -> Bool {
         let tile = map[Tiles.index(x), Tiles.index(y - epsilon)]
         return tile.isSolid || tile.isOneWay

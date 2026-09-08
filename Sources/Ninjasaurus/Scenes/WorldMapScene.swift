@@ -63,7 +63,7 @@ final class WorldMapScene: BaseScene {
         addChild(marker)
         marker.run(SKAction.repeatForever(SKAction.sequence([.moveBy(x: 0, y: 6, duration: 0.25), .moveBy(x: 0, y: -6, duration: 0.25)])))
 
-        statusText.text = "LIVES x\(context.session.lives)   COINS x\(context.session.coins)"
+        statusText.text = "LIVES x\(context.session.lives)   SCROLLS x\(context.session.coins)"
         bestText.text = "BEST \(String(format: "%06d", context.progress.bestScore))"
         layoutForSize()
     }

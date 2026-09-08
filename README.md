@@ -1,7 +1,7 @@
 # Ninjasaurus
 
 A Mario-style side-scroller for iPhone: a ninja against dinosaurs, made for a six-year-old.
-Stomp raptors, bump blocks, grab coins, get big with an onigiri, throw shurikens, and bonk Rex on the head three times.
+Stomp raptors, bump blocks, grab scrolls, get big with an onigiri, throw shurikens, and bonk Rex on the head three times.
 
 Everything is generated in code. Sprites are pixel art stored as character grids and rasterized at launch, sound effects are synthesized, and the icon comes from a script. No third-party dependencies, no network, no ads.
 
@@ -42,7 +42,7 @@ Sources/Ninjasaurus/
   Audio/      tone synth, sound recipes, AVAudioEngine player
 Resources/Levels/   one text file per level
 Tests/              XCTest suite for the pure Swift parts
-scripts/            icon generator, Apple setup checklist, export options
+scripts/            icon generator (scripts/icon), Apple setup checklist, export options
 ```
 
 The simulation never imports SpriteKit. `GameWorld.step` takes an input state and returns events, which is what the tests drive.
@@ -60,7 +60,7 @@ GGGGGGGGGGGGGGGG
 ################
 ```
 
-`.` empty, `G` ground top, `#` fill, `=` brick, `?` coin block, `M` power-up block, `*` katana block, `+` 1-up brick, `o` coin, `^` cloud (one-way), `L` `l` log cap and body, `~` hazard, `C` checkpoint lantern, `|` stone wall.
+`.` empty, `G` ground top, `#` fill, `=` brick, `?` scroll block, `M` power-up block, `*` katana block, `+` 1-up brick, `o` scroll, `^` cloud (one-way), `L` `l` log cap and body, `~` hazard, `C` checkpoint lantern, `|` stone wall.
 Markers: `S` start, `F` torii gate (2 wide, 3 tall, bottom-left anchor), `r` Raptor, `a` Anky, `p` Ptero, `s` Stego, `X` Rex.
 
 ## Releasing to TestFlight

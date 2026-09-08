@@ -6,7 +6,7 @@ final class TextureStore {
     private let atlas: SKTexture
     private let atlasSize: Int
     private let rects: [String: AtlasRect]
-    private let scales: [String: Int]
+    private let scales: [String: Double]
     private var cache: [String: SKTexture] = [:]
 
     init() {

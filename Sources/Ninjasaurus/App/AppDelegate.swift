@@ -8,7 +8,8 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
         // Ambient: respects the silent switch and mixes with whatever is already playing.
-        try? AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default)
+        // Playback ignores the silent switch; mixWithOthers keeps the parent's music going.
+        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
         try? AVAudioSession.sharedInstance().setActive(true)
         return true
     }

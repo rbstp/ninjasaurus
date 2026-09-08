@@ -22,7 +22,7 @@ struct BlockSystem: Sendable {
         case .questionPower:
             map[coord] = .used
             bumps[coord] = frame
-            return .spawnItem(form == .small && roll >= 0.4 ? .onigiri : .shurikenScroll)
+            return .spawnItem(form == .small && roll >= 0.25 ? .onigiri : .shurikenScroll)
         case .questionKatana:
             map[coord] = .used
             bumps[coord] = frame

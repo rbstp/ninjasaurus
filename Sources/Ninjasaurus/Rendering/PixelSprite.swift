@@ -9,9 +9,9 @@ struct PixelSprite: Equatable, Sendable {
     let height: Int
     let pixels: [PixelColor]
     /// Sprite pixels per game unit.
-    let scale: Int
+    let scale: Double
 
-    init(width: Int, height: Int, pixels: [PixelColor], scale: Int = 1) {
+    init(width: Int, height: Int, pixels: [PixelColor], scale: Double = 1) {
         precondition(pixels.count == width * height, "pixel count mismatch")
         self.width = width
         self.height = height
@@ -19,8 +19,8 @@ struct PixelSprite: Equatable, Sendable {
         self.scale = scale
     }
 
-    var unitWidth: Double { Double(width) / Double(scale) }
-    var unitHeight: Double { Double(height) / Double(scale) }
+    var unitWidth: Double { Double(width) / scale }
+    var unitHeight: Double { Double(height) / scale }
 
     init(palette: Palette, rows: [String]) {
         do {

@@ -25,9 +25,11 @@ class Enemy: Entity {
 
     func walk(in world: GameWorld) {
         if hitWall { facing = facing.flipped }
-        if turnsAtLedges && onGround {
+        if onGround {
             let footX = facing == .right ? rect.maxX + 1 : rect.minX - 1
-            if !TileCollider.hasFloor(x: footX, belowY: rect.minY, in: world.map) {
+            if TileCollider.hazardAhead(x: footX, footY: rect.minY, in: world.map) {
+                facing = facing.flipped
+            } else if turnsAtLedges && !TileCollider.hasFloor(x: footX, belowY: rect.minY, in: world.map) {
                 facing = facing.flipped
             }
         }
@@ -119,6 +121,9 @@ final class Anky: Enemy {
             }
         case .ballMoving:
             if hitWall { facing = facing.flipped }
+            if onGround && TileCollider.hazardAhead(x: facing == .right ? rect.maxX + 1 : rect.minX - 1, footY: rect.minY, in: world.map) {
+                facing = facing.flipped
+            }
             velocity.x = facing.sign * GameConstants.ballSpeed
             setAnim(.ball, frame: world.frame)
         }

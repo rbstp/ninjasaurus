@@ -17,5 +17,5 @@ enum SpriteArt {
     }()
 
     /// Reserved for atlas packing checks: every registered sprite and its scale.
-    static var scales: [String: Int] { registry.mapValues { $0.scale } }
+    static var scales: [String: Double] { registry.mapValues { $0.scale } }
 }

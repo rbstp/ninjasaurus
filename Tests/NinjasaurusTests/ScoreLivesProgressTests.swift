@@ -10,15 +10,15 @@ final class ScoreLivesProgressTests: XCTestCase {
     }
 
     @MainActor
-    func testHundredCoinsGiveALifeAndWrap() {
+    func testCoinsGiveALifeAndWrap() {
         let session = GameSession()
-        for _ in 0..<99 {
+        for _ in 0..<(GameConstants.coinsPerLife - 1) {
             XCTAssertFalse(session.addCoin())
         }
         XCTAssertTrue(session.addCoin())
         XCTAssertEqual(session.coins, 0)
         XCTAssertEqual(session.lives, GameConstants.startingLives + 1)
-        XCTAssertEqual(session.score, 100 * GameConstants.coinScore)
+        XCTAssertEqual(session.score, GameConstants.coinsPerLife * GameConstants.coinScore)
     }
 
     @MainActor
