@@ -64,3 +64,4 @@ fastlane/test_output
 # Ninjasaurus: the Xcode project is generated from project.yml by xcodegen.
 *.xcodeproj
 DerivedData/
+buildServer.json

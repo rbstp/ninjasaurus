@@ -13,6 +13,17 @@ final class GameContext {
     let progress = ProgressStore()
     let textures = TextureStore()
     let audio = AudioPlayer()
+
+    init() {
+        audio.isMusicEnabled = progress.musicEnabled
+    }
+
+    func toggleMusic() {
+        progress.musicEnabled.toggle()
+        audio.isMusicEnabled = progress.musicEnabled
+    }
+
+    var musicLabel: String { progress.musicEnabled ? "MUSIC ON" : "MUSIC OFF" }
 }
 
 class BaseScene: SKScene {
@@ -43,8 +54,13 @@ class BaseScene: SKScene {
 
     func layoutForSize() {}
 
-    func applicationWillResignActive() {}
-    func applicationDidBecomeActive() {}
+    func applicationWillResignActive() {
+        context.audio.setAppActive(false)
+    }
+
+    func applicationDidBecomeActive() {
+        context.audio.setAppActive(true)
+    }
 
     func present(_ scene: BaseScene, transition: SKTransition = .fade(withDuration: 0.4)) {
         scene.size = size
